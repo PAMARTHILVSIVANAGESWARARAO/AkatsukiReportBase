@@ -152,6 +152,51 @@ Access protected user count endpoint. Requires JWT token. Returns the total numb
 
 ---
 
+### 5. POST /api/dashboard/news
+
+Fetch scraped news for a specific Akatsuki member. Requires JWT token. Looks up the member's news URL from the database and scrapes the latest headlines.
+
+**Headers:**
+
+| Key | Value |
+|-----|-------|
+| `Authorization` | `Bearer eyJhbGciOiJIUzI1NiJ9...` |
+| `Content-Type` | `application/json` |
+
+**Request Body:**
+
+```json
+{
+  "akatsukiMemberName": "itachi"
+}
+```
+
+**Success Response (200 OK):**
+
+```json
+{
+  "akatsuki_member_name": "itachi",
+  "status": "success",
+  "requestedUrl": "https://news.google.com/home?hl=en-IN&gl=IN&ceid=IN%3Aen",
+  "title": "Google News",
+  "headlines": [
+    "Top Story 1",
+    "Top Story 2"
+  ]
+}
+```
+
+**Error Responses:**
+
+| Status Code | Condition | Response Body |
+|-------------|-----------|---------------|
+| `400 Bad Request` | Missing akatsukiMemberName | `{ "message": "akatsukiMemberName is required" }` |
+| `400 Bad Request` | Member not found in DB | `{ "message": "Akatsuki member not found: {name}" }` |
+| `401 Unauthorized` | No token provided | `{ "message": "Unauthorized" }` |
+| `401 Unauthorized` | Invalid/expired token | `{ "message": "Unauthorized" }` |
+
+---
+
 ## Token Details
 
 - **Type:** Bearer JWT

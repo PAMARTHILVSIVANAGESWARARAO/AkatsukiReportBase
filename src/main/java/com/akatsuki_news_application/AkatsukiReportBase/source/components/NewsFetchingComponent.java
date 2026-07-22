@@ -7,17 +7,12 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
-@RestController
-@RequestMapping("/news")
+@Component
 public class NewsFetchingComponent {
 
-    @GetMapping("/fetch")
-    public LinkedHashMap<String, Object> fetchNews(@RequestParam("url") String targetUrl) {
+    public LinkedHashMap<String, Object> fetchNews(String targetUrl) {
 
         LinkedHashMap<String, Object> response = new LinkedHashMap<>();
 

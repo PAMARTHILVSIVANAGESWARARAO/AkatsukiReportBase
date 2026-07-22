@@ -85,7 +85,7 @@ public class AkatsukiMembersDataInitializer implements CommandLineRunner {
              akatsukiMemberRepository.save(new AkatsukiMember(
                     "itachi",
                     "home",
-                    "https://news.google.com/home?hl=en-IN&gl=IN&ceid=IN%3Aen"
+                    "https://news.google.com/topics/CAAqKggKIiRDQkFTRlFvSUwyMHZNRFp1ZEdvU0JXVnVMVWRDR2dKSlRpZ0FQAQ?hl=en-IN&gl=IN&ceid=IN%3Aen"
             ));
 
 
