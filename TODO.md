@@ -12,3 +12,11 @@
   - Add new route `GET /api/dashboard/user-count`
 - [x] Step 5: Update `README.md` with new/updated API docs
 
+## Task: Add News Scraping Endpoint
+
+### Steps:
+- [x] Step 1: Refactor `NewsFetchingComponent.java` — make it a `@Component` service
+- [x] Step 2: Create `NewsRequest.java` DTO
+- [x] Step 3: Add `POST /api/dashboard/news` route to `DashboardController.java`
+- [x] Step 4: Update `README.md`
+
