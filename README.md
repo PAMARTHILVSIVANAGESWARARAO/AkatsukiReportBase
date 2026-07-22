@@ -197,6 +197,173 @@ Fetch scraped news for a specific Akatsuki member. Requires JWT token. Looks up 
 
 ---
 
+### 6. POST /api/dashboard/reviews
+
+Create a new review on an Akatsuki member's news headline. Requires JWT token. Rating must be between 1 and 5.
+
+**Headers:**
+
+| Key | Value |
+|-----|-------|
+| `Authorization` | `Bearer eyJhbGciOiJIUzI1NiJ9...` |
+| `Content-Type` | `application/json` |
+
+**Request Body:**
+
+```json
+{
+  "akatsukiMemberName": "itachi",
+  "newsHeadline": "Top Story 1",
+  "reviewText": "Great coverage of the latest updates!",
+  "rating": 5
+}
+```
+
+**Success Response (200 OK):**
+
+```json
+{
+  "id": 1,
+  "username": "pain",
+  "akatsukiMemberName": "itachi",
+  "newsHeadline": "Top Story 1",
+  "reviewText": "Great coverage of the latest updates!",
+  "rating": 5,
+  "createdAt": "2025-01-15T12:30:00",
+  "updatedAt": "2025-01-15T12:30:00"
+}
+```
+
+**Error Responses:**
+
+| Status Code | Condition | Response Body |
+|-------------|-----------|---------------|
+| `400 Bad Request` | Missing required fields | `{ "message": "reviewText is required" }` |
+| `400 Bad Request` | Invalid rating | `{ "message": "rating must be between 1 and 5" }` |
+| `400 Bad Request` | Member not found | `{ "message": "Akatsuki member not found: ..." }` |
+| `401 Unauthorized` | No/invalid token | `{ "message": "Unauthorized" }` |
+
+---
+
+### 7. GET /api/dashboard/reviews
+
+Fetch all reviews with associated user and Akatsuki member info. Requires JWT token. Results are ordered by newest first.
+
+**Headers:**
+
+| Key | Value |
+|-----|-------|
+| `Authorization` | `Bearer eyJhbGciOiJIUzI1NiJ9...` |
+
+**Success Response (200 OK):**
+
+```json
+{
+  "reviews": [
+    {
+      "id": 1,
+      "username": "pain",
+      "akatsukiMemberName": "itachi",
+      "newsHeadline": "Top Story 1",
+      "reviewText": "Great coverage of the latest updates!",
+      "rating": 5,
+      "createdAt": "2025-01-15T12:30:00",
+      "updatedAt": "2025-01-15T12:30:00"
+    },
+    {
+      "id": 2,
+      "username": "konan",
+      "akatsukiMemberName": "obito",
+      "newsHeadline": "Breaking News",
+      "reviewText": "Interesting perspective!",
+      "rating": 4,
+      "createdAt": "2025-01-15T12:25:00",
+      "updatedAt": "2025-01-15T12:25:00"
+    }
+  ]
+}
+```
+
+**Error Responses:**
+
+| Status Code | Condition | Response Body |
+|-------------|-----------|---------------|
+| `401 Unauthorized` | No/invalid token | `{ "message": "Unauthorized" }` |
+
+---
+
+### 8. PUT /api/dashboard/reviews/{id}
+
+Update an existing review. Only the review owner can update it. Supports partial updates — only send the fields you want to change.
+
+**Headers:**
+
+| Key | Value |
+|-----|-------|
+| `Authorization` | `Bearer eyJhbGciOiJIUzI1NiJ9...` |
+| `Content-Type` | `application/json` |
+
+**Request Body (partial update example):**
+
+```json
+{
+  "reviewText": "Updated my thoughts on this news!",
+  "rating": 4
+}
+```
+
+**Success Response (200 OK):**
+
+```json
+{
+  "id": 1,
+  "username": "pain",
+  "akatsukiMemberName": "itachi",
+  "newsHeadline": "Top Story 1",
+  "reviewText": "Updated my thoughts on this news!",
+  "rating": 4,
+  "createdAt": "2025-01-15T12:30:00",
+  "updatedAt": "2025-01-15T12:35:00"
+}
+```
+
+**Error Responses:**
+
+| Status Code | Condition | Response Body |
+|-------------|-----------|---------------|
+| `400 Bad Request` | Review not found or not owner | `{ "message": "Review not found or not authorized to update" }` |
+| `400 Bad Request` | Invalid rating | `{ "message": "rating must be between 1 and 5" }` |
+| `401 Unauthorized` | No/invalid token | `{ "message": "Unauthorized" }` |
+
+---
+
+### 9. DELETE /api/dashboard/reviews/{id}
+
+Delete a review. Only the review owner can delete it.
+
+**Headers:**
+
+| Key | Value |
+|-----|-------|
+| `Authorization` | `Bearer eyJhbGciOiJIUzI1NiJ9...` |
+
+**Success Response (200 OK):**
+
+```json
+{
+  "message": "Review deleted successfully"
+}
+```
+
+**Error Responses:**
+
+| Status Code | Condition | Response Body |
+|-------------|-----------|---------------|
+| `400 Bad Request` | Review not found or not owner | `{ "message": "Review not found or not authorized to delete" }` |
+| `401 Unauthorized` | No/invalid token | `{ "message": "Unauthorized" }` |
+
+---
+
 ## Token Details
 
 - **Type:** Bearer JWT
