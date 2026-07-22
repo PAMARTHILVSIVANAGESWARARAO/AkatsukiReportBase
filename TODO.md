@@ -14,3 +14,12 @@
 ## ✅ Step 12: Create DashboardController (dashboard)
 ## ✅ Step 13: Update application.properties with JWT config
 
+---
+
+# Akatsuki Members Table & Seed Data - ✅ COMPLETED
+
+## ✅ Step 1: Create AkatsukiMember model (src/main/java/.../source/model/AkatsukiMember.java)
+## ✅ Step 2: Create AkatsukiMemberRepository (src/main/java/.../source/repository/AkatsukiMemberRepository.java)
+## ✅ Step 3: Create AkatsukiMembersDataInitializer (src/main/java/.../source/components/AkatsukiMembersDataInitializer.java)
+   - Inserts 10 constant members (obito, kakuzu, sasori, deidara, kisame, orichimaru, konan, hidan, zetsu, itachi) on app startup when table is empty
+
