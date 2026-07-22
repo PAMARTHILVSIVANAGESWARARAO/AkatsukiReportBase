@@ -12,13 +12,178 @@ A Spring Boot application with JWT-based authentication.
 - **MySQL** (Database)
 - **Lombok** (Boilerplate reduction)
 
-## Architecture
+## Core Architecture
 
+```mermaid
+flowchart LR
+    A([Controller]) --> B([Service])
+    B --> C([DAO])
+    C --> D([Repository])
+    D --> E[(Database)]
+    B --> F([Model / Entity])
 ```
-Controller → Service → DAO → Repository → Database
-                           ↓
-                        Model (Entity)
+
+## System Design
+
+### Architectural Diagram
+
+```mermaid
+flowchart TB
+    User(["User (Client)"])
+
+    subgraph SYS["AKATSUKI REPORT BASE — System Boundary"]
+        direction TB
+
+        subgraph AUTH["Authentication"]
+            A1["Register"]
+            A2["Login"]
+            A3["JWT Token"]
+        end
+
+        subgraph DASH["Dashboard"]
+            D1["User Info"]
+            D2["Member List"]
+            D3["User Count"]
+        end
+
+        subgraph NEWS["News Scraping"]
+            N1["Fetch News"]
+            N2["Jsoup Parser"]
+            N3["Headlines"]
+        end
+
+        subgraph REV["Review Management"]
+            R1["Create Review"]
+            R2["View Reviews"]
+            R3["Update Review"]
+            R4["Delete Review"]
+        end
+
+        AUTH --> NEWS
+        DASH --> REV
+    end
+
+    User --> AUTH
+    User --> DASH
 ```
+
+### Database Schema
+
+<img src="./images/akatsukidb.png" alt="dbshema"></img>
+
+### Class Diagram
+
+```mermaid
+classDiagram
+    class User {
+        -Long id
+        -String email
+        -String username
+        -String password
+    }
+
+    class AkatsukiMember {
+        -Long id
+        -String name
+        -String newsType
+        -String newsScrapedUrl
+    }
+
+    class Review {
+        -Long id
+        -User user
+        -AkatsukiMember akatsukiMember
+        -String newsHeadline
+        -String reviewText
+        -Integer rating
+        -LocalDateTime createdAt
+        -LocalDateTime updatedAt
+    }
+
+    User "1" --> "many" Review : writes
+    AkatsukiMember "1" --> "many" Review : reviewed on
+```
+
+### Sequence Diagrams
+
+**Authentication Flow:**
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant AuthController
+    participant UserService
+    participant UserRepository
+    participant JWT
+
+    User->>AuthController: POST /api/auth/register
+    AuthController->>UserService: register()
+    UserService->>UserRepository: save()
+    UserRepository-->>UserService: User entity
+    UserService->>JWT: generateToken()
+    JWT-->>UserService: Token
+    UserService-->>AuthController: Token
+    AuthController-->>User: 201 Created + Token
+```
+
+**News Review Flow:**
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant DashboardController
+    participant ReviewService
+    participant Repository
+
+    User->>DashboardController: POST /api/dashboard/reviews (JWT + body)
+    DashboardController->>ReviewService: createReview()
+    ReviewService->>Repository: findByUsername() [validate user]
+    ReviewService->>Repository: findByName() [validate member]
+    ReviewService->>ReviewService: validateRating()
+    ReviewService->>Repository: save(review)
+    Repository-->>ReviewService: Review entity
+    ReviewService-->>DashboardController: ReviewResponse
+    DashboardController-->>User: 200 OK + ReviewResponse
+```
+
+### Functional Requirements
+
+1. **User Authentication** — Register & login with email/password, receive JWT token
+2. **Role-based Access** — Protected routes require valid JWT Bearer token
+3. **News Scraping** — Fetch Google News headlines for each Akatsuki member via Jsoup
+4. **Review Management** — Authenticated users can create, read, update, and delete reviews on news headlines
+5. **Rating System** — Reviews include a numeric rating from 1 to 5
+6. **Ownership Control** — Users can only modify/delete their own reviews
+7. **Member Directory** — View all Akatsuki member names and their corresponding news feeds
+
+### Non-Functional Requirements
+
+1. **Performance** — News scraping operates with a 5-second timeout to prevent blocking
+2. **Security** — Passwords hashed with BCrypt; JWT tokens expire after 15 hours
+3. **Scalability** — Stateless JWT authentication allows horizontal scaling
+4. **Data Integrity** — JPA with `ddl-auto=update` ensures schema consistency with entities
+5. **Maintainability** — Layered architecture (Controller → Service → Repository) for separation of concerns
+6. **Usability** — RESTful API with consistent JSON response format across all endpoints
+
+### Flaws
+
+1. **No Pagination** — `GET /api/dashboard/reviews` returns all reviews at once, which may become slow with large datasets
+2. **No Input Validation Framework** — Uses manual validation in service layer instead of `@Valid` / `@NotNull` annotations
+3. **No Rate Limiting** — News scraping and review creation endpoints lack rate limiting, vulnerable to abuse
+4. **No Soft Deletes** — Deleting a review permanently removes it from the database; no restore capability
+5. **No Admin Role** — No elevated privileges for moderating reviews across all users
+6. **Hardcoded Scraping Selector** — The CSS selector `a.svxzne` in `NewsFetchingComponent` may break if Google News changes its HTML structure
+
+### Future Enhancements
+
+1. **Pagination & Sorting** — Add `page`, `size`, `sort` parameters to the reviews listing endpoint
+2. **Validation Annotations** — Use Jakarta `@Valid`, `@NotBlank`, `@Min`, `@Max` for cleaner request validation
+3. **Role-based Authorization** — Introduce ADMIN role with ability to moderate/delete any review
+4. **Soft Delete** — Add `active` boolean flag to reviews instead of hard delete
+5. **Review Reactions** — Allow users to "like" or "upvote" reviews
+6. **Comment Threads** — Enable nested replies under each review
+7. **News Caching** — Cache scraped news headlines to reduce repeated scraping and improve response times
+8. **WebSocket Notifications** — Notify users in real-time when someone reviews news they also reviewed
 
 ## Authentication Flow
 
@@ -408,3 +573,4 @@ curl -X POST http://localhost:8080/api/auth/login \
 # Dashboard (replace TOKEN with actual JWT)
 curl -X GET http://localhost:8080/api/dashboard \
   -H "Authorization: Bearer TOKEN"
+```
