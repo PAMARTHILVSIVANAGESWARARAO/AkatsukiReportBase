@@ -98,7 +98,7 @@ Authenticate existing user.
 
 ### 3. GET /api/dashboard
 
-Access protected dashboard. Requires JWT token.
+Access protected dashboard. Requires JWT token. Returns the authenticated user's info along with all Akatsuki member names.
 
 **Headers:**
 
@@ -111,7 +111,35 @@ Access protected dashboard. Requires JWT token.
 ```json
 {
   "username": "pain",
-  "message": "Welcome to the dashboard, pain!"
+  "message": "Welcome to the dashboard, pain!",
+  "akatsuki_members": ["itachi", "konan", "obito", "kakuzu", "sasori", "deidara", "kisame", "orichimaru", "hidan", "zetsu"]
+}
+```
+
+**Error Responses:**
+
+| Status Code | Condition | Response Body |
+|-------------|-----------|---------------|
+| `401 Unauthorized` | No token provided | `{ "message": "Unauthorized" }` |
+| `401 Unauthorized` | Invalid/expired token | `{ "message": "Unauthorized" }` |
+
+---
+
+### 4. GET /api/dashboard/user-count
+
+Access protected user count endpoint. Requires JWT token. Returns the total number of registered users (not Akatsuki members).
+
+**Headers:**
+
+| Key | Value |
+|-----|-------|
+| `Authorization` | `Bearer eyJhbGciOiJIUzI1NiJ9...` |
+
+**Success Response (200 OK):**
+
+```json
+{
+  "user_count": 5
 }
 ```
 
