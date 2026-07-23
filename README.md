@@ -11,6 +11,8 @@ A Spring Boot application with JWT-based authentication.
 - **JWT (jjwt 0.12.3)** (Token-based authentication)
 - **MySQL** (Database)
 - **Lombok** (Boilerplate reduction)
+- **Jsoup** (HTML parsing for news scraping)
+- **Groq AI API** (Headline rewriting via Llama 3 model)
 
 ## Core Architecture
 
@@ -49,7 +51,9 @@ flowchart TB
         subgraph NEWS["News Scraping"]
             N1["Fetch News"]
             N2["Jsoup Parser"]
-            N3["Headlines"]
+            N3["Groq AI Rewriter"]
+            N4["Rewritten Headlines"]
+            N1 --> N2 --> N3 --> N4
         end
 
         subgraph REV["Review Management"]
@@ -156,7 +160,20 @@ sequenceDiagram
 6. **Ownership Control** — Users can only modify/delete their own reviews
 7. **Member Directory** — View all Akatsuki member names and their corresponding news feeds
 
-### Non-Functional Requirements
+### Groq AI Headline Rewriting
+
+Every headline scraped from Google News is automatically sent to **Groq AI (Llama 3 model)** for rewriting before being returned in the API response. This provides two key benefits:
+
+1. **Clarity & Readability** — Abbreviations/acronyms are expanded (e.g., `"pm goes delhi"` → `"Prime Minister goes to Delhi"`), grammar is fixed, and capitalization is normalized
+2. **Copyright Protection** — Headlines are paraphrased by AI rather than reproduced verbatim from the source
+
+**Configuration** — The Groq API key is read from the `GROQ_API_KEY` environment variable (configured via `.env` file). The model used is `llama3-8b-8192` by default.
+
+**Fallback** — If the Groq API call fails (network error, quota exceeded, etc.), the original headline is returned as-is, ensuring the news feature never breaks.
+
+---
+
+## Non-Functional Requirements
 
 1. **Performance** — News scraping operates with a 5-second timeout to prevent blocking
 2. **Security** — Passwords hashed with BCrypt; JWT tokens expire after 15 hours
@@ -545,6 +562,7 @@ PORT=8080
 DB_URL=jdbc:mysql://localhost:3306/akatsuki_db
 DB_USERNAME=root
 DB_PASSWORD=your_password
+GROQ_API_KEY=gsk_your_groq_api_key_here
 ```
 
 ## Running the Application
