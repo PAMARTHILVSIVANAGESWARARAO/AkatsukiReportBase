@@ -26,7 +26,7 @@
         <!-- REST API -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <!-- Hibernate + Spring Data JPA -->
@@ -64,10 +64,15 @@
             <optional>true</optional>
         </dependency>
 
+
+        <!-- No additional dependency needed - RestClient is built into spring-boot-starter-web -->
+
+        
+
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 		<!-- .env Configuration  -->
